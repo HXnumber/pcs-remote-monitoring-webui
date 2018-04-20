@@ -17,7 +17,7 @@ export const toRulesModel = (response = {}) => getItems(response)
     'action.type': 'type'
   }));
 
-  export const toRuleModel = (response = {}) => reshape(response, {
+  export const toRuleModel = (response = {}) => camelCaseReshape(response, {
     'id': 'id',
     'conditions': 'conditions',
     'dateCreated': 'dateCreated',
