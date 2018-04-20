@@ -59,7 +59,7 @@ const newRule = {
   description: '',
   groupId: '',
   calculation: '',
-  duration: '5',
+  duration: '',
   conditions: [newCondition()], // Start with one condition
   severity: severityLevels[0],
   enabled: true
@@ -122,6 +122,8 @@ export class RuleEditor extends LinkedComponent {
             error => this.setState({ error, isPending: false })
           );
       } else { // If rule object doesn't exist then create a new rule
+        console.log(formData);
+        return;
         this.subscription = TelemetryService.createRule(toNewRuleRequestModel(formData))
           .subscribe(
             (createdRule) => {
@@ -194,7 +196,11 @@ export class RuleEditor extends LinkedComponent {
       .map(({ value }) => value)
       .withValidator(requiredValidator);
     this.calculationLink = this.formDataLink.forkTo('calculation').map(({ value }) => value).withValidator(requiredValidator);
-    this.durationLink = this.formDataLink.forkTo('duration');
+    this.durationLink = this.formDataLink.forkTo('duration')
+      .check(
+        duration => this.calculationLink.value ? Validator.notEmpty(duration) : true,
+        () => this.props.t('rules.flyouts.ruleEditor.validation.required')
+      );;
     this.conditionsLink = this.formDataLink.forkTo('conditions').withValidator(requiredValidator);
     this.severityLink = this.formDataLink.forkTo('severity');
     //todo toggle button didn't support link
