@@ -48,7 +48,7 @@ export class RulesGrid extends Component {
 
   openEditRuleFlyout = () => { this.setState({ openFlyoutName: 'edit' }); }
 
-  setSelectedRule = selectedRule => { this.setState({ selectedRule }); }
+  setSelectedRule = selectedRule => this.setState({ selectedRule });
 
   getOpenFlyout = () => {
     switch (this.state.openFlyoutName) {
