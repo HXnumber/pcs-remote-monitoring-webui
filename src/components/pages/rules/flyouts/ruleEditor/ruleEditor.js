@@ -72,7 +72,6 @@ export class RuleEditor extends LinkedComponent {
     const { rule } = props;
     const formData = rule ? rule : newRule;
     this.state = {
-      isPending: false,
       error: undefined,
       fieldOptions: [],
       devicesAffected: 0,
@@ -100,6 +99,8 @@ export class RuleEditor extends LinkedComponent {
       this.ruleNameLink,
       this.deviceGroupLink,
       this.conditionsLink,
+      this.durationLink,
+      this.calculationLink
     ].every(link => !link.error);
   }
 
@@ -107,31 +108,26 @@ export class RuleEditor extends LinkedComponent {
     event.preventDefault();
     const { formData } = this.state;
     const { onClose, insertRule, updateRule } = this.props;
-    console.log('TODO: Handle the form submission');
+    if (formData.calculation === calculations[1]) this.setState({ formData: { ...this.state.formData, duration: '' } })
     if (this.formIsValid()) {
-      this.setState({ isPending: true });
       if (this.subscription) this.subscription.unsubscribe();
       if (this.props.rule) { // If rule object exist then update the existing rule
         this.subscription = TelemetryService.updateRule(this.props.rule.id, toNewRuleRequestModel(formData))
           .subscribe(
             (updatedRule) => {
               updateRule(updatedRule);
-              this.setState({ isPending: false });
               onClose();
             },
-            error => this.setState({ error, isPending: false })
+            error => this.setState({ error })
           );
       } else { // If rule object doesn't exist then create a new rule
-        console.log(formData);
-        return;
         this.subscription = TelemetryService.createRule(toNewRuleRequestModel(formData))
           .subscribe(
             (createdRule) => {
               insertRule(createdRule);
-              this.setState({ isPending: false });
               onClose();
             },
-            error => this.setState({ error, isPending: false })
+            error => this.setState({ error })
           );
       }
     }
@@ -197,8 +193,9 @@ export class RuleEditor extends LinkedComponent {
       .withValidator(requiredValidator);
     this.calculationLink = this.formDataLink.forkTo('calculation').map(({ value }) => value).withValidator(requiredValidator);
     this.durationLink = this.formDataLink.forkTo('duration')
+      .map(({ value }) => value)
       .check(
-        duration => this.calculationLink.value ? Validator.notEmpty(duration) : true,
+        duration => this.calculationLink.value === calculations[0] ? Validator.notEmpty(duration) : true,
         () => this.props.t('rules.flyouts.ruleEditor.validation.required')
       );;
     this.conditionsLink = this.formDataLink.forkTo('conditions').withValidator(requiredValidator);
@@ -210,8 +207,11 @@ export class RuleEditor extends LinkedComponent {
       const fieldLink = conditionLink.forkTo('field').map(({ value }) => value).withValidator(requiredValidator);
       const operatorLink = conditionLink.forkTo('operator').withValidator(requiredValidator);
       const valueLink = conditionLink.forkTo('value').withValidator(requiredValidator);
-      return { fieldLink, operatorLink, valueLink };
+      const error = fieldLink.error || operatorLink.error || valueLink.error;
+      return { fieldLink, operatorLink, valueLink, error };
     });
+
+    const conditionsHaveErrors = conditionLinks.some(({ error }) => error);
 
     return (
       <form onSubmit={this.apply} className='new-rule-flyout-container'>
@@ -360,7 +360,7 @@ export class RuleEditor extends LinkedComponent {
           error && <AjaxError t={t} error={error} />
         }
         <BtnToolbar>
-          <Btn primary={true} type="submit" disabled={this.isPending || !this.formIsValid()}>{t('rules.flyouts.ruleEditor.apply')}</Btn>
+          <Btn primary={true} type="submit" disabled={!this.formIsValid() || conditionsHaveErrors}>{t('rules.flyouts.ruleEditor.apply')}</Btn>
           <Btn svg={svgs.cancelX} onClick={onClose}>{t('rules.flyouts.ruleEditor.cancel')}</Btn>
         </BtnToolbar>
       </form>

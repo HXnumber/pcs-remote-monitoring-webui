@@ -345,7 +345,7 @@
         "delete": "Delete",
         "calculation": "Calculation",
         "calculationPlaceholder": "Select",
-        "timePeriod": "Time Period",
+        "timePeriod": "Time Period (in minutes)",
         "condition": {
           "condition": "Condition",
           "field": "Field",
