@@ -342,8 +342,7 @@ export class RuleEditor extends LinkedComponent {
           <SectionDesc>{t('rules.flyouts.ruleEditor.devicesAffected')}</SectionDesc>
         </SummarySection>
         {
-          error &&
-          <AjaxError className="rule-error">{error}</AjaxError>
+          error && <AjaxError t={t} error={error} />
         }
         <BtnToolbar>
           <Btn primary={true} type="submit" disabled={this.isPending || !this.formIsValid()}>{t('rules.flyouts.ruleEditor.apply')}</Btn>
