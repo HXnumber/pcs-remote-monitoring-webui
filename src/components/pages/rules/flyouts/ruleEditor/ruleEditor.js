@@ -10,10 +10,10 @@ import {
   FormLabel,
   Radio,
   ToggleBtn,
-  ErrorMsg,
   SectionDesc,
   SummaryCount,
-  SummarySection
+  SummarySection,
+  AjaxError
 } from 'components/shared';
 import { SeverityRenderer } from 'components/shared/cellRenderers';
 import {
@@ -98,7 +98,6 @@ export class RuleEditor extends LinkedComponent {
     ].every(link => !link.error);
   }
 
-  //TODO: still working on it as of 18/04/18
   apply = (event) => {
     event.preventDefault();
     const { formData } = this.state;
@@ -107,7 +106,7 @@ export class RuleEditor extends LinkedComponent {
     if (this.formIsValid()) {
       this.setState({ isPending: true });
       if (this.subscription) this.subscription.unsubscribe();
-      if (this.props.rule) {
+      if (this.props.rule) { // If rule object exist then update the existing rule
         this.subscription = TelemetryService.updateRule(this.props.rule.id, toNewRuleRequestModel(formData))
           .subscribe(
             (updatedRule) => {
@@ -117,7 +116,7 @@ export class RuleEditor extends LinkedComponent {
             },
             error => this.setState({ error, isPending: false })
           );
-      } else {
+      } else { // If rule object doesn't exist then create a new rule
         this.subscription = TelemetryService.createRule(toNewRuleRequestModel(formData))
           .subscribe(
             (createdRule) => {
@@ -344,10 +343,10 @@ export class RuleEditor extends LinkedComponent {
         </SummarySection>
         {
           error &&
-          <ErrorMsg className="rule-error">{error}</ErrorMsg>
+          <AjaxError className="rule-error">{error}</AjaxError>
         }
         <BtnToolbar>
-          <Btn primary={true} disabled={this.isPending || !this.formIsValid()} onClick={this.apply}>{t('rules.flyouts.ruleEditor.apply')}</Btn>
+          <Btn primary={true} type="submit" disabled={this.isPending || !this.formIsValid()}>{t('rules.flyouts.ruleEditor.apply')}</Btn>
           <Btn svg={svgs.cancelX} onClick={onClose}>{t('rules.flyouts.ruleEditor.cancel')}</Btn>
         </BtnToolbar>
       </form>

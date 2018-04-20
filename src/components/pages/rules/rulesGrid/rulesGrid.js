@@ -46,16 +46,17 @@ export class RulesGrid extends Component {
     }
   };
 
-  openEditRuleFlyout = () => {
-    this.setState({
-      openFlyoutName: 'edit'
-    });
-  }
+  openEditRuleFlyout = () => { this.setState({ openFlyoutName: 'edit' }); }
 
-  setSelectedRule = (rule) => {
-    this.setState({
-      selectedRule: rule
-    });
+  setSelectedRule = (rule) => { this.setState({ selectedRule: rule }); }
+
+  getOpenFlyout = () => {
+    switch (this.state.openFlyoutName) {
+      case 'edit':
+        return <EditRuleFlyout onClose={this.closeFlyout} t={this.props.t} rule={this.state.selectedRule} key="edit-rule-flyout" />
+      default:
+        return null;
+    }
   }
 
   /**
@@ -88,7 +89,6 @@ export class RulesGrid extends Component {
   closeFlyout = () => this.setState(closedFlyoutState);
 
   render() {
-    const { selectedRule, openFlyoutName } = this.state;
     const gridProps = {
       /* Grid Properties */
       ...defaultRulesGridProps,
@@ -104,7 +104,7 @@ export class RulesGrid extends Component {
 
     return ([
       <PcsGrid {...gridProps} key="rules-grid" />,
-      openFlyoutName === 'edit' && <EditRuleFlyout onClose={this.closeFlyout} t={this.props.t} rule={selectedRule} key="edit-rule-flyout" />
+      this.getOpenFlyout()
     ]);
   }
 }
