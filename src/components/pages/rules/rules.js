@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { RulesGrid } from './rulesGrid';
 import { DeviceGroupDropdownContainer as DeviceGroupDropdown } from 'components/app/deviceGroupDropdown';
 import { Btn, RefreshBar, PageContent, ContextMenu } from 'components/shared';
-import { RuleDetails, RuleEditor } from './flyouts';
+import { RuleDetails, NewRuleFlyout } from './flyouts';
 import { svgs } from 'utilities';
 
 import './rules.css';
@@ -64,8 +64,7 @@ export class Rules extends Component {
       isPending,
       lastUpdated,
       entities,
-      fetchRules,
-      deviceGroups
+      fetchRules
     } = this.props;
     const gridProps = {
       rowData: isPending ? undefined : rules || [],
@@ -92,7 +91,7 @@ export class Rules extends Component {
         {!error && <RulesGrid {...gridProps} />}
         <Btn onClick={this.changeDeviceGroup}>Refresh Device Groups</Btn>
         {this.state.openFlyoutName === 'details' && <RuleDetails onClose={this.closeFlyout} rule={entities[this.state.selectedRuleId]} />}
-        {this.state.openFlyoutName === 'newRule' && <RuleEditor onClose={this.closeFlyout} t={this.props.t} deviceGroups={deviceGroups} />}
+        {this.state.openFlyoutName === 'newRule' && <NewRuleFlyout t={t} onClose={this.closeFlyout} />}
       </PageContent>
     ];
   }

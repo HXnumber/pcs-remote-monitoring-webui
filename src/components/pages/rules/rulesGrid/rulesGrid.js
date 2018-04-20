@@ -3,11 +3,20 @@
 import React, { Component } from 'react';
 import { Btn, PcsGrid } from 'components/shared';
 import { rulesColumnDefs, checkboxParams, defaultRulesGridProps } from './rulesGridConfig';
-import { isFunc, translateColumnDefs } from 'utilities';
+import { isFunc, translateColumnDefs, svgs } from 'utilities';
+import { EditRuleFlyout } from '../flyouts'
+
+const closedFlyoutState = {
+  openFlyoutName: undefined,
+  selectedRule: undefined
+};
 
 export class RulesGrid extends Component {
   constructor(props) {
     super(props);
+
+    // Set the initial state
+    this.state = closedFlyoutState;
 
     this.columnDefs = [
       { ...rulesColumnDefs.ruleName, ...checkboxParams },
@@ -24,7 +33,7 @@ export class RulesGrid extends Component {
     // TODO: This is a temporary example implementation. Remove with a better version
     this.contextBtns = {
       disable: <Btn key="disable">Disable</Btn>,
-      edit: <Btn key="edit">Edit</Btn>
+      edit: <Btn key="edit" svg={svgs.edit} onClick={this.openEditRuleFlyout}>{props.t('rules.flyouts.edit')}</Btn>
     };
   }
 
@@ -37,13 +46,25 @@ export class RulesGrid extends Component {
     }
   };
 
+  openEditRuleFlyout = () => {
+    this.setState({
+      openFlyoutName: 'edit'
+    });
+  }
+
+  setSelectedRule = (rule) => {
+    this.setState({
+      selectedRule: rule
+    });
+  }
+
   /**
    * Handles context filter changes and calls any hard select props method
    *
    * @param {Array} selectedDevices A list of currently selected devices
    */
   onHardSelectChange = (selectedDevices) => {
-    const { onContextMenuChange, onHardSelectChange} = this.props;
+    const { onContextMenuChange, onHardSelectChange } = this.props;
     if (isFunc(onContextMenuChange)) {
       if (selectedDevices.length > 1) {
         onContextMenuChange(this.contextBtns.disable);
@@ -52,6 +73,9 @@ export class RulesGrid extends Component {
           this.contextBtns.disable,
           this.contextBtns.edit
         ]);
+        if (isFunc(this.setSelectedRule)) {
+          this.setSelectedRule(selectedDevices[0]);
+        }
       } else {
         onContextMenuChange(null);
       }
@@ -61,7 +85,10 @@ export class RulesGrid extends Component {
     }
   }
 
-  render () {
+  closeFlyout = () => this.setState(closedFlyoutState);
+
+  render() {
+    const { selectedRule, openFlyoutName } = this.state;
     const gridProps = {
       /* Grid Properties */
       ...defaultRulesGridProps,
@@ -75,8 +102,9 @@ export class RulesGrid extends Component {
       onGridReady: this.onGridReady
     };
 
-    return  (
-      <PcsGrid {...gridProps} />
-    );
+    return ([
+      <PcsGrid {...gridProps} key="rules-grid" />,
+      openFlyoutName === 'edit' && <EditRuleFlyout onClose={this.closeFlyout} t={this.props.t} rule={selectedRule} key="edit-rule-flyout" />
+    ]);
   }
 }
