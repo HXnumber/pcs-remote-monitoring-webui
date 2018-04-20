@@ -14,6 +14,8 @@ export const toRulesModel = (response = {}) => getItems(response)
     'groupId': 'groupId',
     'name': 'name',
     'severity': 'severity',
+    'calculation': 'calculation',
+    'duration': 'duration',
     'action.type': 'type'
   }));
 
@@ -28,6 +30,8 @@ export const toRulesModel = (response = {}) => getItems(response)
     'groupId': 'groupId',
     'name': 'name',
     'severity': 'severity',
+    'calculation': 'calculation',
+    'duration': 'duration',
     'action.type': 'type'
   });
 
@@ -84,13 +88,13 @@ export const toNewRuleRequestModel = ({
   groupId,
   conditions,
   severity,
-  enabled
+  enabled,
+  calculation,
+  duration
 }) => {
   const Conditions = conditions.map(condition => ({
     Field: condition.field,
     Operator: condition.operator,
-    Calculation: condition.calculation,
-    Duration: condition.duration,
     Value: condition.value
   }));
   return {
@@ -99,6 +103,8 @@ export const toNewRuleRequestModel = ({
     GroupId: groupId,
     Severity: severity,
     Enabled: enabled,
+    Calculation: calculation,
+    Duration: duration,
     Conditions
   };
 }
