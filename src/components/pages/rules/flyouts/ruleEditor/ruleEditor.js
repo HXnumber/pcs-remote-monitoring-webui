@@ -108,7 +108,7 @@ export class RuleEditor extends LinkedComponent {
     event.preventDefault();
     const { formData } = this.state;
     const { onClose, insertRule, updateRule } = this.props;
-    if (formData.calculation === calculations[1]) this.setState({ formData: { ...this.state.formData, timePeriod: '' } })
+    if (formData.calculation === calculations[1]) formData.timePeriod = '';
     if (this.formIsValid()) {
       if (this.subscription) this.subscription.unsubscribe();
       if (this.props.rule) { // If rule object exist then update the existing rule
