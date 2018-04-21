@@ -121,6 +121,7 @@ export class RuleEditor extends LinkedComponent {
             error => this.setState({ error })
           );
       } else { // If rule object doesn't exist then create a new rule
+      } else { // If rule object doesn't exist then create a new rule
         this.subscription = TelemetryService.createRule(toNewRuleRequestModel(formData))
           .subscribe(
             (createdRule) => {
