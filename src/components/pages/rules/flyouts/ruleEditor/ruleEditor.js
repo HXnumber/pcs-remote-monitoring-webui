@@ -30,7 +30,7 @@ import './ruleEditor.css';
 const Section = Flyout.Section;
 const severityLevels = ['critical', 'warning', 'info'];
 const calculations = ['average', 'instant'];
-const durationOptions = [
+const timePeriodOptions = [
   { label: '1', value: '1' },
   { label: '5', value: '5' },
   { label: '10', value: '10' }
@@ -59,7 +59,7 @@ const newRule = {
   description: '',
   groupId: '',
   calculation: '',
-  duration: '',
+  timePeriod: '',
   conditions: [newCondition()], // Start with one condition
   severity: severityLevels[0],
   enabled: true
@@ -99,7 +99,7 @@ export class RuleEditor extends LinkedComponent {
       this.ruleNameLink,
       this.deviceGroupLink,
       this.conditionsLink,
-      this.durationLink,
+      this.timePeriodLink,
       this.calculationLink
     ].every(link => !link.error);
   }
@@ -108,7 +108,7 @@ export class RuleEditor extends LinkedComponent {
     event.preventDefault();
     const { formData } = this.state;
     const { onClose, insertRule, updateRule } = this.props;
-    if (formData.calculation === calculations[1]) this.setState({ formData: { ...this.state.formData, duration: '' } })
+    if (formData.calculation === calculations[1]) this.setState({ formData: { ...this.state.formData, timePeriod: '' } })
     if (this.formIsValid()) {
       if (this.subscription) this.subscription.unsubscribe();
       if (this.props.rule) { // If rule object exist then update the existing rule
@@ -120,7 +120,6 @@ export class RuleEditor extends LinkedComponent {
             },
             error => this.setState({ error })
           );
-      } else { // If rule object doesn't exist then create a new rule
       } else { // If rule object doesn't exist then create a new rule
         this.subscription = TelemetryService.createRule(toNewRuleRequestModel(formData))
           .subscribe(
@@ -193,10 +192,10 @@ export class RuleEditor extends LinkedComponent {
       .map(({ value }) => value)
       .withValidator(requiredValidator);
     this.calculationLink = this.formDataLink.forkTo('calculation').map(({ value }) => value).withValidator(requiredValidator);
-    this.durationLink = this.formDataLink.forkTo('duration')
+    this.timePeriodLink = this.formDataLink.forkTo('timePeriod')
       .map(({ value }) => value)
       .check(
-        duration => this.calculationLink.value === calculations[0] ? Validator.notEmpty(duration) : true,
+        timePeriod => this.calculationLink.value === calculations[0] ? Validator.notEmpty(timePeriod) : true,
         () => this.props.t('rules.flyouts.ruleEditor.validation.required')
       );;
     this.conditionsLink = this.formDataLink.forkTo('conditions').withValidator(requiredValidator);
@@ -264,8 +263,8 @@ export class RuleEditor extends LinkedComponent {
                 <FormControl
                   type='select'
                   className='short'
-                  link={this.durationLink}
-                  options={durationOptions}
+                  link={this.timePeriodLink}
+                  options={timePeriodOptions}
                   clearable={false}
                   searchable={false} />
               </FormGroup>

@@ -17,7 +17,7 @@ export const toRuleModel = (response = {}) => camelCaseReshape(response, {
   'name': 'name',
   'severity': 'severity',
   'calculation': 'calculation',
-  'duration': 'duration',
+  'timePeriod': 'timePeriod',
   'action.type': 'type'
 });
 
@@ -76,7 +76,7 @@ export const toNewRuleRequestModel = ({
   severity,
   enabled,
   calculation,
-  duration
+  timePeriod
 }) => {
   const Conditions = conditions.map(condition => ({
     Field: condition.field,
@@ -90,7 +90,7 @@ export const toNewRuleRequestModel = ({
     Severity: severity,
     Enabled: enabled,
     Calculation: calculation,
-    Duration: duration,
+    TimePeriod: timePeriod,
     Conditions
   };
 }
